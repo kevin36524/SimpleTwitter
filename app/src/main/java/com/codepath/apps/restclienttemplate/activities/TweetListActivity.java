@@ -1,10 +1,16 @@
 package com.codepath.apps.restclienttemplate.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.R;
@@ -14,7 +20,6 @@ import com.codepath.apps.restclienttemplate.adapters.TwitterListAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TweetListActivity extends AppCompatActivity {
@@ -25,8 +30,9 @@ public class TweetListActivity extends AppCompatActivity {
     List<Tweet> tweets;
     TwitterListAdapter twitterListAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
-
+    Toolbar toolbar;
     LinearLayoutManager linearLayoutManager;
+    TextView tvToolbarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,13 @@ public class TweetListActivity extends AppCompatActivity {
         twitterListAdapter = new TwitterListAdapter(tweets, this);
         linearLayoutManager = new LinearLayoutManager(this);
         rvTweetsList.setLayoutManager(linearLayoutManager);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tvToolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
+        tvToolbarTitle.setText("Simple Tweets");
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
@@ -72,6 +85,26 @@ public class TweetListActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tweet_activity_menu, menu);
+
+        MenuItem compose = menu.findItem(R.id.miCompose);
+        compose.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.d(TAG, "Start a new compose Activity");
+                Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
+                startActivity(it);
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+
 
     private void fetchTimelineAsync(int i) {
         twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
