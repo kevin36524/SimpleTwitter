@@ -12,6 +12,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,11 +21,12 @@ import java.util.List;
 
 public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.TweetViewHolder> {
 
-    public List<Tweet> tweets;
+    public ArrayList<Tweet> tweets;
     public Context mContext;
 
     public TwitterListAdapter(List<Tweet> tweets, Context context) {
-        this.tweets = tweets;
+        this.tweets = new ArrayList<Tweet>();
+        this.tweets.addAll(tweets);
         this.mContext = context;
     }
 
@@ -41,7 +43,8 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
     }
 
     public void resetTweets(List<Tweet> tweets) {
-        this.tweets = tweets;
+        this.tweets = new ArrayList<Tweet>();
+        this.tweets.addAll(tweets);
         this.notifyDataSetChanged();
     }
 
@@ -84,5 +87,9 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
             tvUserHandle = (TextView) itemView.findViewById(R.id.tvUserHandle);
             tvRelativeTime = (TextView) itemView.findViewById(R.id.tvRelativeTime);
         }
+    }
+
+    public long getLastTweetID() {
+        return tweets.get(tweets.size() - 1).getId();
     }
 }

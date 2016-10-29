@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
@@ -56,12 +57,14 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
-	public void getTimeline(int count, int since_id, int max_id, AsyncHttpResponseHandler handler) {
+	public void getTimeline(Integer count, Integer since_id, Long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
 		params.put("count", count);
 		params.put("since_id", since_id);
-//		params.put("max_id",max_id);
+		if (max_id != null) {
+			params.put("max_id",max_id);
+		}
 		client.get(apiUrl, params, handler);
 	}
 
@@ -69,16 +72,20 @@ public class TwitterClient extends OAuthBaseClient {
 		public void fetchedTweets(List<Tweet> tweets);
 	}
 
-	public void getTimelineTweets(int count, int since_id, int max_id, final TweetsResponseInterface tweetsResponseInterface) {
+	public void getTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
 		getTimeline(count, since_id, max_id, new TextHttpResponseHandler() {
 			@Override
 			public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
+                Log.d(TAG, "Some error with fetching");
 			}
 
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, String responseString) {
 				Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
+                if (max_id != null) {
+                    tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
+                    return;
+                }
 				for (int i = 0; i < tweets.length ; i++) {
 					tweets[i].save();
 					tweets[i].getUser().save();
