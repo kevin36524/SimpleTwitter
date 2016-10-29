@@ -1,6 +1,12 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import com.codepath.apps.restclienttemplate.MyDatabase;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import org.parceler.Parcel;
 
 /**
  * Created by patelkev on 10/27/16.
@@ -65,15 +71,37 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
     }
   */
 
+@Table(database = MyDatabase.class)
+@Parcel(analyze={TweetUser.class})
 public class TweetUser extends BaseModel {
+
+    @PrimaryKey
+    @Column
     long id;
+
+    @Column
     String name;
+
+    @Column
     String screen_name;
+
+    @Column
     String description;
+
+    @Column
     String url;
+
+    @Column
     String profile_image_url;
+
+    @Column
     String profile_image_url_https;
+
+    @Column
     String profile_banner_url;
+
+    public TweetUser() {
+    }
 
     public long getId() {
         return id;

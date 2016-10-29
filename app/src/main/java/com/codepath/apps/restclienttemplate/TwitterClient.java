@@ -5,6 +5,7 @@ import android.content.Context;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -38,7 +39,8 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_CONSUMER_SECRET = "Uw3nIGLm3HiqB5NK55oAO2AkJX6GJr2jkTgynePGpb5JdS7KIF"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://simpleTwitter"; // Change this (here and in manifest)
 
-	final Gson gson = new Gson();
+	final String DATE_FORMAT = "EEE MMM dd HH:mm:ss Z yyyy";
+	final Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -77,6 +79,10 @@ public class TwitterClient extends OAuthBaseClient {
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, String responseString) {
 				Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
+				for (int i = 0; i < tweets.length ; i++) {
+					tweets[i].save();
+					tweets[i].getUser().save();
+				}
 				tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
 			}
 		});

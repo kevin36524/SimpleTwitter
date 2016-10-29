@@ -1,6 +1,17 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.text.format.DateUtils;
+
+import com.codepath.apps.restclienttemplate.MyDatabase;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import org.parceler.Parcel;
+
+import java.util.Date;
 
 /**
  * Created by patelkev on 10/27/16.
@@ -46,15 +57,45 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
     "lang": "en"
 }
 */
+
+@Table(database = MyDatabase.class)
+@Parcel(analyze={Tweet.class})
 public class Tweet extends BaseModel {
+
+    @PrimaryKey
+    @Column
     long id;
+
+    @Column
+    Date created_at;
+
+    @Column
     String text;
+
+    @Column
+    @ForeignKey(saveForeignKeyModel = false)
     TweetUser user;
+
+    @Column
     int retweet_count;
+
+    @Column
     int favorite_count;
+
+    public Tweet() {
+    }
 
     public long getId() {
         return id;
+    }
+
+    public String relativeTime() {
+        if (created_at == null) {
+            return "";
+        }
+        long dateMillis = created_at.getTime();
+        return DateUtils.getRelativeTimeSpanString(dateMillis,
+                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
     }
 
     public void setId(long id) {
