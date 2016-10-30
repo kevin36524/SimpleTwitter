@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,10 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetUser;
+import com.squareup.picasso.Picasso;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -30,6 +35,7 @@ public class TweetComposeActivity extends AppCompatActivity {
     TextView tvTweetLength;
     Button tweetButton;
     Context mContext;
+    TweetUser currentUser;
 
     public static final int maxTweetLength = 180;
 
@@ -38,6 +44,7 @@ public class TweetComposeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_compose);
         mContext = this;
+        currentUser = Parcels.unwrap(getIntent().getParcelableExtra("currentUser"));
         bindViewReferences();
     }
 
@@ -50,10 +57,14 @@ public class TweetComposeActivity extends AppCompatActivity {
         tvTweetLength = (TextView) findViewById(R.id.tvTweetLength);
         tweetButton = (Button) findViewById(R.id.tweetButton);
 
+        tvScreenName.setText(currentUser.getName());
+        tvHandle.setText("@"+currentUser.getScreen_name());
+        Picasso.with(this).load(currentUser.getProfile_image_url_https()).into(ivProfile);
+
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                setResult(204); finish();
             }
         });
         etTweetContent.addTextChangedListener(new TextWatcher() {
@@ -85,13 +96,16 @@ public class TweetComposeActivity extends AppCompatActivity {
                     SimpleTwitterApplication.getTwitterClient().postTweet(tweetContent, new TwitterClient.TweetsResponseInterface() {
                         @Override
                         public void fetchedTweets(List<Tweet> tweets) {
+                            Intent rtIntent = new Intent();
+                            rtIntent.putExtra("code", 200);
+                            rtIntent.putExtra("tweet", Parcels.wrap(tweets.get(0)));
+                            setResult(200, rtIntent);
                             finish();
                         }
                     });
                 }
             }
         });
-
 
     }
 

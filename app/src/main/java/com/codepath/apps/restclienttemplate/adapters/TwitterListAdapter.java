@@ -53,6 +53,11 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         this.notifyDataSetChanged();
     }
 
+    public void appendTweetAtPosition(Tweet tweet, int position) {
+        tweets.add(position, tweet);
+        this.notifyItemInserted(position);
+    }
+
     @Override
     public void onBindViewHolder(TweetViewHolder holder, int position) {
         Tweet tweet = tweets.get(position);

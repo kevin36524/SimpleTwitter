@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetUser;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -67,6 +68,22 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
+    public void getCurrentUserDetails(final TweetUserResponseInterface tweetUserResponseInterface) {
+        String apiUrl = getApiUrl("account/verify_credentials.json");
+        client.get(apiUrl, null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                TweetUser user = gson.fromJson(responseString, TweetUser.class);
+                tweetUserResponseInterface.fetchedUserInfo(user);
+            }
+        });
+    }
+
 	public void getTimeline(Integer count, Integer since_id, Long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
@@ -81,6 +98,10 @@ public class TwitterClient extends OAuthBaseClient {
 	public interface TweetsResponseInterface {
 		public void fetchedTweets(List<Tweet> tweets);
 	}
+
+    public interface TweetUserResponseInterface {
+        public void fetchedUserInfo(TweetUser user);
+    }
 
 	public void getTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
 		getTimeline(count, since_id, max_id, new TextHttpResponseHandler() {

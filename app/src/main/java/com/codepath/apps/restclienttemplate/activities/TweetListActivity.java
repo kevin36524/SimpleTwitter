@@ -18,7 +18,10 @@ import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.adapters.TwitterListAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetUser;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class TweetListActivity extends AppCompatActivity {
     TwitterListAdapter twitterListAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
     Toolbar toolbar;
+    TweetUser currentUser;
     LinearLayoutManager linearLayoutManager;
     TextView tvToolbarTitle;
 
@@ -78,6 +82,13 @@ public class TweetListActivity extends AppCompatActivity {
         rvTweetsList.setAdapter(twitterListAdapter);
         twitterClient = SimpleTwitterApplication.getTwitterClient(); // singleton instance
 
+        twitterClient.getCurrentUserDetails(new TwitterClient.TweetUserResponseInterface() {
+            @Override
+            public void fetchedUserInfo(TweetUser user) {
+                currentUser = user;
+            }
+        });
+
         twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
             @Override
             public void fetchedTweets(List<Tweet> tweets) {
@@ -96,7 +107,8 @@ public class TweetListActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(TAG, "Start a new compose Activity");
                 Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
-                startActivity(it);
+                it.putExtra("currentUser", Parcels.wrap(currentUser));
+                startActivityForResult(it, 200);
                 return true;
             }
         });
@@ -104,7 +116,15 @@ public class TweetListActivity extends AppCompatActivity {
         return true;
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        Tweet postedTweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
+        twitterListAdapter.appendTweetAtPosition(postedTweet, 0);
+        rvTweetsList.smoothScrollToPosition(0);
+    }
 
     private void fetchTimelineAsync(int i) {
         twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
