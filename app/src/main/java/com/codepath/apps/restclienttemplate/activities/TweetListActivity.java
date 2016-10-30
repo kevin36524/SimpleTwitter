@@ -1,8 +1,12 @@
 package com.codepath.apps.restclienttemplate.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,41 +48,28 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_list);
-        rvTweetsList = (RecyclerView) findViewById(R.id.rvTweetsList);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        bindViews();
+        initializeTweetsListWithCachedData();
+        bindEndlessScrollViewListener();
+        makeInitialNetworkCalls();
+    }
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchTimelineAsync(0);
-            }
-        });
-
+    private void initializeTweetsListWithCachedData() {
         tweets = SQLite.select().from(Tweet.class).queryList();
         twitterListAdapter = new TwitterListAdapter(tweets, this, this);
         linearLayoutManager = new LinearLayoutManager(this);
         rvTweetsList.setLayoutManager(linearLayoutManager);
+        rvTweetsList.setAdapter(twitterListAdapter);
+    }
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        tvToolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
-        tvToolbarTitle.setText("Simple Tweets");
-
-        fab_compose = (FloatingActionButton) findViewById(R.id.fab_compose);
-        fab_compose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Start a new compose Activity");
-                Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
-                it.putExtra("currentUser", Parcels.wrap(currentUser));
-                startActivityForResult(it, 200);
-            }
-        });
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+    private void bindEndlessScrollViewListener() {
         EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                if (!isNetworkAvailable()) {
+                    showError("No network connectivity");
+                    return;
+                }
                 twitterClient.getTimelineTweets(25, 1, twitterListAdapter.getLastTweetID(), new TwitterClient.TweetsResponseInterface() {
                     @Override
                     public void fetchedTweets(List<Tweet> tweets) {
@@ -90,9 +81,46 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
 
         // Adds the scroll listener to RecyclerView
         rvTweetsList.addOnScrollListener(scrollListener);
+    }
 
-        rvTweetsList.setAdapter(twitterListAdapter);
+    private void bindViews() {
+        rvTweetsList = (RecyclerView) findViewById(R.id.rvTweetsList);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync();
+            }
+        });
+
+        // Toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tvToolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
+        tvToolbarTitle.setText("Simple Tweets");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Floating Compose
+        fab_compose = (FloatingActionButton) findViewById(R.id.fab_compose);
+        fab_compose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Start a new compose Activity");
+                Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
+                it.putExtra("currentUser", Parcels.wrap(currentUser));
+                startActivityForResult(it, 200);
+            }
+        });
+    }
+
+    private void makeInitialNetworkCalls() {
+
         twitterClient = SimpleTwitterApplication.getTwitterClient(); // singleton instance
+
+        if (!isNetworkAvailable()) {
+            showError("No network connectivity");
+            return;
+        }
 
         twitterClient.getCurrentUserDetails(new TwitterClient.TweetUserResponseInterface() {
             @Override
@@ -126,15 +154,20 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
         rvTweetsList.smoothScrollToPosition(0);
     }
 
-    private void fetchTimelineAsync(int i) {
-        twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
-            @Override
-            public void fetchedTweets(List<Tweet> tweets) {
-                // TODO update adapter
-                twitterListAdapter.resetTweets(tweets);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+    private void fetchTimelineAsync() {
+        if (!isNetworkAvailable()) {
+            showError("No network connectivity");
+            swipeRefreshLayout.setRefreshing(false);
+        } else {
+            twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
+                @Override
+                public void fetchedTweets(List<Tweet> tweets) {
+                    // TODO update adapter
+                    twitterListAdapter.resetTweets(tweets);
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            });
+        }
     }
 
     @Override
@@ -142,5 +175,18 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
         Intent intent = new Intent(this, TweetDetailActivity.class);
         intent.putExtra("selectedTweet", Parcels.wrap(tweet));
         startActivity(intent);
+    }
+
+    private void showError(String errorString) {
+        //Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+        Snackbar.make(rvTweetsList, errorString, Snackbar.LENGTH_SHORT)
+                .show();
+    }
+
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 }
