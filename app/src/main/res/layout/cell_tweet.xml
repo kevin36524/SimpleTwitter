@@ -46,6 +46,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autoLink="web"
         android:layout_toRightOf="@+id/ivProfile"
         android:layout_below="@+id/tvUserName"
         android:text="LinkedIn Q3 sales up 23% to $960M in its last earnings ahead of MSFT acquisition https://t.co/QYEOmFFhwO"

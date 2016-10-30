@@ -25,7 +25,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-public class TweetListActivity extends AppCompatActivity {
+public class TweetListActivity extends AppCompatActivity implements TwitterListAdapter.ClickDelegate {
 
     public static final String TAG = TweetListActivity.class.toString();
     TwitterClient twitterClient;
@@ -53,7 +53,7 @@ public class TweetListActivity extends AppCompatActivity {
         });
 
         tweets = SQLite.select().from(Tweet.class).queryList();
-        twitterListAdapter = new TwitterListAdapter(tweets, this);
+        twitterListAdapter = new TwitterListAdapter(tweets, this, this);
         linearLayoutManager = new LinearLayoutManager(this);
         rvTweetsList.setLayoutManager(linearLayoutManager);
 
@@ -135,5 +135,14 @@ public class TweetListActivity extends AppCompatActivity {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    @Override
+    public void onTweetClicked(Tweet tweet) {
+        Intent intent = new Intent(this, TweetDetailActivity.class);
+        intent.putExtra("selectedTweet", Parcels.wrap(tweet));
+        startActivity(intent);
+
+
     }
 }

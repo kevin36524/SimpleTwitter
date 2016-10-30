@@ -23,11 +23,17 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
 
     public ArrayList<Tweet> tweets;
     public Context mContext;
+    public ClickDelegate clickDelegate;
 
-    public TwitterListAdapter(List<Tweet> tweets, Context context) {
+    public interface ClickDelegate {
+        public void onTweetClicked(Tweet tweet);
+    }
+
+    public TwitterListAdapter(List<Tweet> tweets, Context context, ClickDelegate clickDelegate) {
         this.tweets = new ArrayList<Tweet>();
         this.tweets.addAll(tweets);
         this.mContext = context;
+        this.clickDelegate = clickDelegate;
     }
 
     @Override
@@ -37,7 +43,7 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
 
         View tweetCell = inflater.inflate(R.layout.cell_tweet, parent, false);
 
-        TweetViewHolder tweetViewHolder = new TweetViewHolder(tweetCell);
+        TweetViewHolder tweetViewHolder = new TweetViewHolder(tweetCell, clickDelegate);
 
         return tweetViewHolder;
     }
@@ -76,21 +82,31 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         return tweets.size();
     }
 
-    public class TweetViewHolder extends RecyclerView.ViewHolder {
+    public class TweetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView tvTilte;
         ImageView ivProfile;
         TextView tvUserName;
         TextView tvUserHandle;
         TextView tvRelativeTime;
+        ClickDelegate clickDelegate;
 
-        public TweetViewHolder(View itemView) {
+        public TweetViewHolder(View itemView, ClickDelegate clickDelegate) {
             super(itemView);
             tvTilte = (TextView) itemView.findViewById(R.id.tvTitle);
             ivProfile = (ImageView) itemView.findViewById(R.id.ivProfile);
             tvUserName = (TextView) itemView.findViewById(R.id.tvUserName);
             tvUserHandle = (TextView) itemView.findViewById(R.id.tvUserHandle);
             tvRelativeTime = (TextView) itemView.findViewById(R.id.tvRelativeTime);
+            this.clickDelegate = clickDelegate;
+            tvTilte.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            Tweet activeTweet = tweets.get(position);
+            clickDelegate.onTweetClicked(activeTweet);
         }
     }
 
