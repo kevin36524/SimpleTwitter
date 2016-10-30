@@ -55,8 +55,10 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
     }
 
     public void appendTweets(List<Tweet> addedTweets) {
-        this.tweets.addAll(addedTweets);
-        this.notifyDataSetChanged();
+        int currentSize = tweets.size();
+        this.tweets.addAll(tweets.size(),addedTweets);
+        int newSize = tweets.size();
+        this.notifyItemRangeInserted(currentSize, newSize);
     }
 
     public void appendTweetAtPosition(Tweet tweet, int position) {

@@ -54,4 +54,6 @@ dependencies {
     compile 'org.parceler:parceler-api:1.1.1'
     apt 'org.parceler:parceler:1.1.1'
     compile 'com.nineoldandroids:library:2.4.0'
+
+    compile "com.android.support:design:24.2.1"
 }

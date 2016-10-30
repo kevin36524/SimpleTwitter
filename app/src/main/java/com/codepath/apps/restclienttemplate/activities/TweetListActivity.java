@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
@@ -37,6 +38,7 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
     TweetUser currentUser;
     LinearLayoutManager linearLayoutManager;
     TextView tvToolbarTitle;
+    FloatingActionButton fab_compose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,16 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
         tvToolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
         tvToolbarTitle.setText("Simple Tweets");
 
+        fab_compose = (FloatingActionButton) findViewById(R.id.fab_compose);
+        fab_compose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Start a new compose Activity");
+                Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
+                it.putExtra("currentUser", Parcels.wrap(currentUser));
+                startActivityForResult(it, 200);
+            }
+        });
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -101,18 +113,6 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.tweet_activity_menu, menu);
 
-        MenuItem compose = menu.findItem(R.id.miCompose);
-        compose.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "Start a new compose Activity");
-                Intent it = new Intent(TweetListActivity.this, TweetComposeActivity.class);
-                it.putExtra("currentUser", Parcels.wrap(currentUser));
-                startActivityForResult(it, 200);
-                return true;
-            }
-        });
-
         return true;
     }
 
@@ -142,7 +142,5 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
         Intent intent = new Intent(this, TweetDetailActivity.class);
         intent.putExtra("selectedTweet", Parcels.wrap(tweet));
         startActivity(intent);
-
-
     }
 }
