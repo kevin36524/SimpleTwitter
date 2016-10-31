@@ -68,6 +68,23 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
+    public void postRetweet(String id, final TweetsResponseInterface tweetsResponseInterface) {
+        String apiUrl = getApiUrl("statuses/retweet/" + id + ".json");
+        client.post(apiUrl, null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, "failed to reTweet " + responseString);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                ArrayList<Tweet> tweets = new ArrayList<Tweet>();
+                tweets.add(gson.fromJson(responseString, Tweet.class));
+                tweetsResponseInterface.fetchedTweets(tweets);
+            }
+        });
+    }
+
     public void getCurrentUserDetails(final TweetUserResponseInterface tweetUserResponseInterface) {
         String apiUrl = getApiUrl("account/verify_credentials.json");
         client.get(apiUrl, null, new TextHttpResponseHandler() {
@@ -118,6 +135,7 @@ public class TwitterClient extends OAuthBaseClient {
                     return;
                 }
 				for (int i = 0; i < tweets.length ; i++) {
+                    tweets[i].setMediaUrl(tweets[i].getMediaUrl());
 					tweets[i].save();
 					tweets[i].getUser().save();
 				}

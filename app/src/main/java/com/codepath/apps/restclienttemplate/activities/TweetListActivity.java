@@ -140,7 +140,6 @@ public class TweetListActivity extends AppCompatActivity implements TwitterListA
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.tweet_activity_menu, menu);
-
         return true;
     }
 

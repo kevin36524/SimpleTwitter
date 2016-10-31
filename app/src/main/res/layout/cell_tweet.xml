@@ -52,4 +52,10 @@
         android:text="LinkedIn Q3 sales up 23% to $960M in its last earnings ahead of MSFT acquisition https://t.co/QYEOmFFhwO"
         />
 
+    <ImageView
+        android:id="@+id/ivMediaImage"
+        android:layout_below="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

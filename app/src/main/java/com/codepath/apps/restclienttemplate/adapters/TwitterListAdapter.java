@@ -73,7 +73,13 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         holder.tvUserName.setText(tweet.getUser().getName());
         holder.tvUserHandle.setText("@" + tweet.getUser().getScreen_name());
         holder.tvRelativeTime.setText(tweet.relativeTime());
+        holder.ivProfile.setImageResource(0);
+        holder.ivMediaImage.setImageResource(0);
         Picasso.with(mContext).load(tweet.getUser().getProfile_image_url_https()).into(holder.ivProfile);
+        if (tweet.getMediaUrl() != null) {
+            Picasso.with(mContext).load(tweet.getMediaUrl()).into(holder.ivMediaImage);
+        }
+
     }
 
     @Override
@@ -92,6 +98,7 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         TextView tvUserHandle;
         TextView tvRelativeTime;
         ClickDelegate clickDelegate;
+        ImageView ivMediaImage;
 
         public TweetViewHolder(View itemView, ClickDelegate clickDelegate) {
             super(itemView);
@@ -100,6 +107,7 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
             tvUserName = (TextView) itemView.findViewById(R.id.tvUserName);
             tvUserHandle = (TextView) itemView.findViewById(R.id.tvUserHandle);
             tvRelativeTime = (TextView) itemView.findViewById(R.id.tvRelativeTime);
+            ivMediaImage = (ImageView) itemView.findViewById(R.id.ivMediaImage);
             this.clickDelegate = clickDelegate;
             tvTilte.setOnClickListener(this);
         }
