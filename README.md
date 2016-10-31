@@ -52,7 +52,11 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
+GIF Link - https://dl.dropboxusercontent.com/u/14553390/twitter_demo.gif
 <img src='https://dl.dropboxusercontent.com/u/14553390/twitter_demo.gif' title='Video Walkthrough' width='300px' alt='Video Walkthrough' />
+
+Video Link
+https://drive.google.com/file/d/0B51SPIRHTG6mcm5vdWRzVUtsNFU/view?usp=sharing
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
