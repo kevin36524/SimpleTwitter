@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,14 +7,26 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:fitsSystemWindows="true"
+    android:background="@android:color/holo_blue_dark"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".activities.LoginActivity" >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simple Twitter"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="30dp"
+        />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
+        android:layout_centerInParent="true"
         android:onClick="loginToRest"
         android:text="@string/login_label" />
 
-</RelativeLayout>
+</LinearLayout>
