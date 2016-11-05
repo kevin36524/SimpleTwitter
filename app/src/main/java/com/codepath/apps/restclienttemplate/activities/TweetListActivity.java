@@ -18,33 +18,54 @@ import android.widget.TextView;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
-import com.codepath.apps.restclienttemplate.fragments.TweetsListFragment;
+import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetUser;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.parceler.Parcels;
 
-import java.util.List;
-
-public class TweetListActivity extends AppCompatActivity implements TweetsListFragment.TweetsListFragmentsListener {
+public class TweetListActivity extends AppCompatActivity implements HomeTimelineFragment.HomeTimeLineFragmentListener {
 
     public static final String TAG = TweetListActivity.class.toString();
-    TwitterClient twitterClient;
 
     SwipeRefreshLayout swipeRefreshLayout;
     Toolbar toolbar;
     TweetUser currentUser;
     TextView tvToolbarTitle;
     FloatingActionButton fab_compose;
-    TweetsListFragment tweetsListFragment;
+    HomeTimelineFragment homeTimelineFragment;
+    TwitterClient twitterClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_list);
+
+        if (savedInstanceState == null) {
+            homeTimelineFragment = (HomeTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.tweetsListFragment);
+        }
+
         bindViews();
         makeInitialNetworkCalls();
+    }
+
+    private void makeInitialNetworkCalls() {
+
+        twitterClient = SimpleTwitterApplication.getTwitterClient(); // singleton instance
+
+        if (!isNetworkAvailable()) {
+            showError("No network connectivity");
+            return;
+        }
+
+        twitterClient.getCurrentUserDetails(new TwitterClient.TweetUserResponseInterface() {
+            @Override
+            public void fetchedUserInfo(TweetUser user) {
+                currentUser = user;
+            }
+        });
+
+        homeTimelineFragment.fetchTimelineAsync();
     }
 
     private void bindViews() {
@@ -52,14 +73,11 @@ public class TweetListActivity extends AppCompatActivity implements TweetsListFr
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchTimelineAsync();
+                homeTimelineFragment.fetchTimelineAsync();
             }
         });
 
-        tweetsListFragment = (TweetsListFragment) getSupportFragmentManager().findFragmentById(R.id.tweetsListFragment);
-        tweetsListFragment.tweetsListFragmentsListener = this;
-        List<Tweet> tweets = SQLite.select().from(Tweet.class).queryList();
-        tweetsListFragment.resetRecyclerViewWithTweets(tweets);
+        homeTimelineFragment.setHomeTimeLineFragmentListener(this);
 
         // Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -82,30 +100,6 @@ public class TweetListActivity extends AppCompatActivity implements TweetsListFr
     }
 
 
-    private void makeInitialNetworkCalls() {
-
-        twitterClient = SimpleTwitterApplication.getTwitterClient(); // singleton instance
-
-        if (!isNetworkAvailable()) {
-            showError("No network connectivity");
-            return;
-        }
-
-        twitterClient.getCurrentUserDetails(new TwitterClient.TweetUserResponseInterface() {
-            @Override
-            public void fetchedUserInfo(TweetUser user) {
-                currentUser = user;
-            }
-        });
-
-        twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
-            @Override
-            public void fetchedTweets(List<Tweet> tweets) {
-                tweetsListFragment.resetRecyclerViewWithTweets(tweets);
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.tweet_activity_menu, menu);
@@ -118,44 +112,24 @@ public class TweetListActivity extends AppCompatActivity implements TweetsListFr
             return;
         }
         Tweet postedTweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
-        tweetsListFragment.insertTweetAtPosition(postedTweet, 0);
+        homeTimelineFragment.insertTweetAtPosition(postedTweet, 0);
     }
 
-    private void fetchTimelineAsync() {
-        if (!isNetworkAvailable()) {
-            showError("No network connectivity");
-            swipeRefreshLayout.setRefreshing(false);
-        } else {
-            twitterClient.getTimelineTweets(25, 1, null, new TwitterClient.TweetsResponseInterface() {
-                @Override
-                public void fetchedTweets(List<Tweet> tweets) {
-                    tweetsListFragment.resetRecyclerViewWithTweets(tweets);
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-            });
-        }
+    @Override
+    public void setRefreshing(Boolean refreshing) {
+        swipeRefreshLayout.setRefreshing(refreshing);
     }
 
-    private void showError(String errorString) {
-        //Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
-        Snackbar.make(swipeRefreshLayout, errorString, Snackbar.LENGTH_SHORT)
-                .show();
-    }
-
-    private Boolean isNetworkAvailable() {
+    public Boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    @Override
-    public void fetchNewTweetsWithLastTweetID(long lastTweetID) {
-        twitterClient.getTimelineTweets(25, 1, lastTweetID, new TwitterClient.TweetsResponseInterface() {
-            @Override
-            public void fetchedTweets(List<Tweet> tweets) {
-                tweetsListFragment.appendTweets(tweets);
-            }
-        });
+    public void showError(String errorString) {
+        //Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+        Snackbar.make(swipeRefreshLayout, errorString, Snackbar.LENGTH_SHORT)
+                .show();
     }
 }

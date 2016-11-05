@@ -67,10 +67,14 @@ public class TweetsListFragment extends Fragment implements TwitterListAdapter.C
         endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                tweetsListFragmentsListener.fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
+                loadMoreTweets(page,totalItemsCount,view);
             }
         };
         rvTweetsList.addOnScrollListener(endlessRecyclerViewScrollListener);
+    }
+
+    protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
+        tweetsListFragmentsListener.fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
     }
 
     @Override
