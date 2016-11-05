@@ -19,6 +19,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.MentionsTimelineFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetUser;
 
@@ -33,7 +34,7 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
     TweetUser currentUser;
     TextView tvToolbarTitle;
     FloatingActionButton fab_compose;
-    HomeTimelineFragment homeTimelineFragment;
+    MentionsTimelineFragment homeTimelineFragment;
     TwitterClient twitterClient;
 
     @Override
@@ -42,7 +43,7 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
         setContentView(R.layout.activity_tweet_list);
 
         if (savedInstanceState == null) {
-            homeTimelineFragment = (HomeTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.tweetsListFragment);
+            homeTimelineFragment = (MentionsTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.tweetsListFragment);
         }
 
         bindViews();

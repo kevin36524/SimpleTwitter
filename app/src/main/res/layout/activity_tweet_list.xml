@@ -27,7 +27,7 @@
         <fragment
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment"
+            android:name="com.codepath.apps.restclienttemplate.fragments.MentionsTimelineFragment"
             android:id="@+id/tweetsListFragment"
             tools:layout="@layout/fragment_tweets_list" />
     </android.support.v4.widget.SwipeRefreshLayout>

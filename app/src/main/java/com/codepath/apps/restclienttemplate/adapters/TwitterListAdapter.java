@@ -120,7 +120,10 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         }
     }
 
-    public long getLastTweetID() {
+    public Long getLastTweetID() {
+        if (tweets.size() == 0) {
+            return null;
+        }
         return tweets.get(tweets.size() - 1).getId();
     }
 }
