@@ -36,6 +36,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
 
     @Override
     protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
+        tweetsListFragmentsListener.setRefreshing(false);
     }
 
     private void fetchNewTweetsWithLastTweetID(final Long lastTweetID) {

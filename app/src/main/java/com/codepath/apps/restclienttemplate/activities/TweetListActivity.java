@@ -7,6 +7,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,39 +17,48 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
+import com.astuetz.PagerSlidingTabStrip;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.adapters.TweetsListFragmentsPagerAdapter;
 import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
 import com.codepath.apps.restclienttemplate.fragments.MentionsTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.TweetsListFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetUser;
 
 import org.parceler.Parcels;
 
-public class TweetListActivity extends AppCompatActivity implements HomeTimelineFragment.TweetsListFragmentsListener {
+public class TweetListActivity extends AppCompatActivity
+        implements TweetsListFragment.TweetsListFragmentsListener,
+        TweetsListFragmentsPagerAdapter.TweetsListFragmentsPagerDataSource {
 
     public static final String TAG = TweetListActivity.class.toString();
+    static final int NUM_OF_FRAGMENTS = 2;
+    static final String fragmentTitles[] = {"Home", "@Mentions"};
 
     SwipeRefreshLayout swipeRefreshLayout;
     Toolbar toolbar;
     TweetUser currentUser;
     TextView tvToolbarTitle;
     FloatingActionButton fab_compose;
-    MentionsTimelineFragment homeTimelineFragment;
+    HomeTimelineFragment homeTimelineFragment;
+    MentionsTimelineFragment mentionsTimelineFragment;
+    TweetsListFragment currentFragment;
     TwitterClient twitterClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_list);
-
-        if (savedInstanceState == null) {
-            homeTimelineFragment = (MentionsTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.tweetsListFragment);
-        }
-
         bindViews();
         makeInitialNetworkCalls();
+    }
+
+    public void setCurrentFragment(TweetsListFragment currentFragment) {
+        this.currentFragment = currentFragment;
+        currentFragment.fetchTimelineAsync();
     }
 
     private void makeInitialNetworkCalls() {
@@ -66,7 +77,6 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
             }
         });
 
-        homeTimelineFragment.fetchTimelineAsync();
     }
 
     private void bindViews() {
@@ -74,11 +84,18 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                homeTimelineFragment.fetchTimelineAsync();
+                currentFragment.fetchTimelineAsync();
             }
         });
 
-        homeTimelineFragment.tweetsListFragmentsListener = this;
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new TweetsListFragmentsPagerAdapter(getSupportFragmentManager(), this));
+
+        // Give the PagerSlidingTabStrip the ViewPager
+        PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        // Attach the view pager to the tab strip
+        tabsStrip.setViewPager(viewPager);
 
         // Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -113,7 +130,7 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
             return;
         }
         Tweet postedTweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
-        homeTimelineFragment.insertTweetAtPosition(postedTweet, 0);
+        currentFragment.insertTweetAtPosition(postedTweet, 0);
     }
 
     @Override
@@ -132,5 +149,28 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
         //Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
         Snackbar.make(swipeRefreshLayout, errorString, Snackbar.LENGTH_SHORT)
                 .show();
+    }
+
+    // Fragment page Adapter Datasource Methods
+    @Override
+    public Fragment getItem(int position) {
+        if (position == 0) {
+            currentFragment = new HomeTimelineFragment();
+        } else {
+            currentFragment = new MentionsTimelineFragment();
+        }
+        currentFragment.tweetsListFragmentsListener = this;
+
+        return currentFragment;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return fragmentTitles[position];
+    }
+
+    @Override
+    public int getCount() {
+        return NUM_OF_FRAGMENTS;
     }
 }

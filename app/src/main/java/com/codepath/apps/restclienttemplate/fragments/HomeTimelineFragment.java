@@ -19,7 +19,6 @@ import java.util.List;
 
 public class HomeTimelineFragment extends TweetsListFragment {
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,15 +30,12 @@ public class HomeTimelineFragment extends TweetsListFragment {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         List<Tweet> tweets = SQLite.select().from(Tweet.class).queryList();
         resetRecyclerViewWithTweets(tweets);
+        fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
         return v;
     }
 
     @Override
     protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
-        Long lastTweetID = null;
-        if (page != 0) {
-            lastTweetID = twitterListAdapter.getLastTweetID();
-        }
         fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
     }
 
