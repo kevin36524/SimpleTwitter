@@ -24,7 +24,7 @@ import com.codepath.apps.restclienttemplate.models.TweetUser;
 
 import org.parceler.Parcels;
 
-public class TweetListActivity extends AppCompatActivity implements HomeTimelineFragment.HomeTimeLineFragmentListener {
+public class TweetListActivity extends AppCompatActivity implements HomeTimelineFragment.TweetsListFragmentsListener {
 
     public static final String TAG = TweetListActivity.class.toString();
 
@@ -77,7 +77,7 @@ public class TweetListActivity extends AppCompatActivity implements HomeTimeline
             }
         });
 
-        homeTimelineFragment.setHomeTimeLineFragmentListener(this);
+        homeTimelineFragment.tweetsListFragmentsListener = this;
 
         // Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);

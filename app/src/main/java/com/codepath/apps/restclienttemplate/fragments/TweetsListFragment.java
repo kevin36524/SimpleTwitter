@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.activities.TweetDetailActivity;
 import com.codepath.apps.restclienttemplate.adapters.TwitterListAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -25,14 +27,15 @@ import java.util.List;
  * Created by patelkev on 11/4/16.
  */
 
-public class TweetsListFragment extends Fragment implements TwitterListAdapter.ClickDelegate {
+public abstract class TweetsListFragment extends Fragment implements TwitterListAdapter.ClickDelegate {
 
     public interface TweetsListFragmentsListener {
-        void fetchNewTweetsWithLastTweetID(long lastTweetID);
+        void setRefreshing(Boolean refreshing);
+        void showError(String errorString);
+        Boolean isNetworkAvailable();
     }
 
-
-    //inflation logic
+    TwitterClient twitterClient;
     RecyclerView rvTweetsList;
     LinearLayoutManager linearLayoutManager;
     TwitterListAdapter twitterListAdapter;
@@ -40,6 +43,7 @@ public class TweetsListFragment extends Fragment implements TwitterListAdapter.C
     public TweetsListFragmentsListener tweetsListFragmentsListener;
     EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
+    //inflation logic
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,6 +58,7 @@ public class TweetsListFragment extends Fragment implements TwitterListAdapter.C
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        twitterClient = SimpleTwitterApplication.getTwitterClient();
     }
 
     private void initializeTweetsListWithCachedData() {
@@ -73,15 +78,22 @@ public class TweetsListFragment extends Fragment implements TwitterListAdapter.C
         rvTweetsList.addOnScrollListener(endlessRecyclerViewScrollListener);
     }
 
-    protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
-        tweetsListFragmentsListener.fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
-    }
+    abstract void loadMoreTweets(int page, int totalItemsCount, RecyclerView view);
 
     @Override
     public void onTweetClicked(Tweet tweet) {
         Intent intent = new Intent(getActivity(), TweetDetailActivity.class);
         intent.putExtra("selectedTweet", Parcels.wrap(tweet));
         startActivity(intent);
+    }
+
+    public void fetchTimelineAsync() {
+        if (!tweetsListFragmentsListener.isNetworkAvailable()) {
+            tweetsListFragmentsListener.showError("No network connectivity");
+            tweetsListFragmentsListener.setRefreshing(false);
+        } else {
+            loadMoreTweets(0, 25, rvTweetsList);
+        }
     }
 
     // Adapter Interface

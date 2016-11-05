@@ -101,7 +101,7 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
-	public void getTimeline(Integer count, Integer since_id, Long max_id, AsyncHttpResponseHandler handler) {
+	private void getHomeTimeline(Integer count, Integer since_id, Long max_id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
 		params.put("count", count);
@@ -112,6 +112,13 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
+    private void getMentionsTimeline(Integer count, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", count);
+        client.get(apiUrl, params, handler);
+    }
+
 	public interface TweetsResponseInterface {
 		public void fetchedTweets(List<Tweet> tweets);
 	}
@@ -120,8 +127,23 @@ public class TwitterClient extends OAuthBaseClient {
         public void fetchedUserInfo(TweetUser user);
     }
 
-	public void getTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
-		getTimeline(count, since_id, max_id, new TextHttpResponseHandler() {
+    public void getMentionsTimelineTweets(Integer count, final TweetsResponseInterface tweetsResponseInterface) {
+        getMentionsTimeline(count, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, "Some error with fetching");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
+                tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
+            }
+        });
+    }
+
+	public void getHomeTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
+		getHomeTimeline(count, since_id, max_id, new TextHttpResponseHandler() {
 			@Override
 			public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.d(TAG, "Some error with fetching");
