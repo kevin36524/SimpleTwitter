@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.fragments;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,10 +29,10 @@ public class UserTimelineFragment extends TweetsListFragment {
         super.onCreate(savedInstanceState);
     }
 
-    public static UserTimelineFragment newInstance(TweetUser user) {
+    public static UserTimelineFragment newInstance(Parcelable user) {
         UserTimelineFragment userTimelineFragment = new UserTimelineFragment();
         Bundle args = new Bundle();
-        args.putParcelable("user", Parcels.wrap(user));
+        args.putParcelable("user", user);
         userTimelineFragment.setArguments(args);
         userTimelineFragment.setArguments(args);
         return userTimelineFragment;

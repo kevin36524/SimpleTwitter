@@ -7,17 +7,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
-    <RelativeLayout android:id="@+id/user_profile_header"
+    <FrameLayout
+        android:id="@+id/fragment_header_container"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        tools:context="com.codepath.apps.restclienttemplate.activities.UserProfileActivity">
-    </RelativeLayout>
+        android:layout_height="wrap_content">
+    </FrameLayout>
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
     </FrameLayout>
-
-
 </LinearLayout>

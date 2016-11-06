@@ -1,0 +1,93 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    tools:context="com.codepath.apps.restclienttemplate.fragments.UserHeaderFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:minHeight="150dp"
+        app:srcCompat="@drawable/ic_twitter"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        tools:background="@android:color/holo_blue_dark"
+        android:id="@+id/ivPosterImage" />
+
+    <ImageView
+        android:id="@+id/ivProfileImage"
+        tools:background="@android:color/holo_orange_light"
+        app:srcCompat="@drawable/ic_profile"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignBottom="@id/ivPosterImage"
+        />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        tools:text="Tech Crunch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_below="@id/ivProfileImage"/>
+
+    <TextView
+        android:id="@+id/tvScreenName"
+        tools:text="\@Tech Crunch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_below="@id/tvUserName"/>
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        tools:text="Breaking technology news, analysis, and opinions from TechCrunch. The number one guide for all things tech.\nGot a tip? Let us know tips@techcrunch.com"
+        android:layout_below="@id/tvScreenName"
+        />
+
+    <TextView
+        android:id="@+id/tvFollowingCount"
+        android:text="1204"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvDescription"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_small"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/tvFollowingCountLabel"
+        android:text="FOLLOWING"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tvFollowingCount"
+        android:layout_alignBottom="@id/tvFollowingCount"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+      />
+    <TextView
+        android:id="@+id/tvFollowersCount"
+        android:text="1204"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tvFollowingCountLabel"
+        android:layout_alignBottom="@id/tvFollowingCount"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_small"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/followersCountLabel"
+        android:text="FOLLOWERS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tvFollowersCount"
+        android:layout_alignBottom="@id/tvFollowingCount"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        />
+
+</RelativeLayout>

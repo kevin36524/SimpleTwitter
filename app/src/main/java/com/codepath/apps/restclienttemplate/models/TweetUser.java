@@ -83,6 +83,12 @@ public class TweetUser extends BaseModel {
     String name;
 
     @Column
+    long followers_count;
+
+    @Column
+    long friends_count;
+
+    @Column
     String screen_name;
 
     @Column
@@ -165,5 +171,21 @@ public class TweetUser extends BaseModel {
 
     public void setProfile_banner_url(String profile_banner_url) {
         this.profile_banner_url = profile_banner_url;
+    }
+
+    public long getFollowers_count() {
+        return followers_count;
+    }
+
+    public void setFollowers_count(long followers_count) {
+        this.followers_count = followers_count;
+    }
+
+    public long getFriends_count() {
+        return friends_count;
+    }
+
+    public void setFriends_count(long friends_count) {
+        this.friends_count = friends_count;
     }
 }
