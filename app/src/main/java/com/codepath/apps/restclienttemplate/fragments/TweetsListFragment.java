@@ -33,7 +33,6 @@ public abstract class TweetsListFragment extends Fragment implements TwitterList
     public interface TweetsListFragmentsListener {
         void setRefreshing(Boolean refreshing);
         void showError(String errorString);
-        Boolean isNetworkAvailable();
     }
 
     TwitterClient twitterClient;
@@ -102,7 +101,7 @@ public abstract class TweetsListFragment extends Fragment implements TwitterList
     }
 
     public void fetchTimelineAsync() {
-        if (!tweetsListFragmentsListener.isNetworkAvailable()) {
+        if (!twitterClient.isNetworkReachable()) {
             tweetsListFragmentsListener.showError("No network connectivity");
             tweetsListFragmentsListener.setRefreshing(false);
         } else {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class TweetComposeActivity extends AppCompatActivity {
     Button tweetButton;
     Context mContext;
     TweetUser currentUser;
+    RelativeLayout activity;
 
     public static final int maxTweetLength = 180;
 
@@ -56,6 +59,7 @@ public class TweetComposeActivity extends AppCompatActivity {
         etTweetContent = (EditText) findViewById(R.id.etTweetContent);
         tvTweetLength = (TextView) findViewById(R.id.tvTweetLength);
         tweetButton = (Button) findViewById(R.id.tweetButton);
+        activity = (RelativeLayout) findViewById(R.id.activity_tweet_compose);
 
         tvScreenName.setText(currentUser.getName());
         tvHandle.setText("@"+currentUser.getScreen_name());
@@ -101,6 +105,12 @@ public class TweetComposeActivity extends AppCompatActivity {
                             rtIntent.putExtra("tweet", Parcels.wrap(tweets.get(0)));
                             setResult(200, rtIntent);
                             finish();
+                        }
+
+                        @Override
+                        public void requestFailed(String reason) {
+                            Snackbar.make(activity, reason, Snackbar.LENGTH_SHORT)
+                                    .show();
                         }
                     });
                 }

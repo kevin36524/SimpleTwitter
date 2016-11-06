@@ -62,6 +62,11 @@ public class UserTimelineFragment extends TweetsListFragment {
                 }
                 appendTweets(tweets);
             }
+
+            @Override
+            public void requestFailed(String reason) {
+                tweetsListFragmentsListener.showError(reason);
+            }
         });
     }
 }

@@ -1,9 +1,6 @@
 package com.codepath.apps.restclienttemplate.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -66,15 +63,15 @@ public class TweetListActivity extends AppCompatActivity
 
         twitterClient = SimpleTwitterApplication.getTwitterClient(); // singleton instance
 
-        if (!isNetworkAvailable()) {
-            showError("No network connectivity");
-            return;
-        }
-
         twitterClient.getCurrentUserDetails(new TwitterClient.TweetUserResponseInterface() {
             @Override
             public void fetchedUserInfo(TweetUser user) {
                 currentUser = user;
+            }
+
+            @Override
+            public void requestFailed(String reason) {
+                showError(reason);
             }
         });
 
@@ -137,13 +134,6 @@ public class TweetListActivity extends AppCompatActivity
     @Override
     public void setRefreshing(Boolean refreshing) {
         swipeRefreshLayout.setRefreshing(refreshing);
-    }
-
-    public Boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
     public void showError(String errorString) {

@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -92,6 +93,12 @@ public class TweetDetailActivity extends AppCompatActivity {
                         Tweet newTweet = tweets.get(0);
                         selectedTweet.setRetweet_count(newTweet.getRetweet_count());
                         tvRetweetCount.setText("" + newTweet.getRetweet_count());
+                    }
+
+                    @Override
+                    public void requestFailed(String reason) {
+                        Snackbar.make(tvContent, reason, Snackbar.LENGTH_SHORT)
+                                .show();
                     }
                 });
                 anim.start();

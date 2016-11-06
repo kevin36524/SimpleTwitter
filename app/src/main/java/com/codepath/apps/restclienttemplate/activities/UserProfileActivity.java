@@ -43,9 +43,4 @@ public class UserProfileActivity extends AppCompatActivity implements TweetsList
     public void showError(String errorString) {
 
     }
-
-    @Override
-    public Boolean isNetworkAvailable() {
-        return true;
-    }
 }
