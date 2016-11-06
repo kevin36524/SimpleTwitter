@@ -26,7 +26,11 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
     public ClickDelegate clickDelegate;
 
     public interface ClickDelegate {
-        public void onTweetClicked(Tweet tweet);
+        public void onTweetClicked(Tweet tweet, TweetsAction tweetsActions);
+    }
+
+    public enum TweetsAction {
+        TWEETS_ACTION_DETAIL, TWEETS_ACTION_PROFILE
     }
 
     public TwitterListAdapter(List<Tweet> tweets, Context context, ClickDelegate clickDelegate) {
@@ -110,13 +114,24 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
             ivMediaImage = (ImageView) itemView.findViewById(R.id.ivMediaImage);
             this.clickDelegate = clickDelegate;
             tvTilte.setOnClickListener(this);
+            ivProfile.setOnClickListener(this);
+            tvUserName.setOnClickListener(this);
+            tvUserHandle.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
             Tweet activeTweet = tweets.get(position);
-            clickDelegate.onTweetClicked(activeTweet);
+            TweetsAction action = TweetsAction.TWEETS_ACTION_DETAIL;
+            switch (v.getId()) {
+                case R.id.tvUserHandle:
+                case R.id.tvUserName:
+                case R.id.ivProfile:
+                    action = TweetsAction.TWEETS_ACTION_PROFILE;
+                    break;
+            }
+            clickDelegate.onTweetClicked(activeTweet,action);
         }
     }
 

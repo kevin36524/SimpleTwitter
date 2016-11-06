@@ -8,7 +8,6 @@ import com.codepath.apps.restclienttemplate.models.TweetUser;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -47,6 +46,63 @@ public class TwitterClient extends OAuthBaseClient {
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+	}
+
+	public interface TweetsResponseInterface {
+		public void fetchedTweets(List<Tweet> tweets);
+	}
+
+    public interface TweetUserResponseInterface {
+        public void fetchedUserInfo(TweetUser user);
+    }
+
+    public void getMentionsTimelineTweets(Integer count, final TweetsResponseInterface tweetsResponseInterface) {
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", count);
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, "Some error with fetching");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
+                tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
+            }
+        });
+    }
+
+	public void getHomeTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
+        String apiUrl = getApiUrl("statuses/home_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", count);
+        params.put("since_id", since_id);
+        if (max_id != null) {
+            params.put("max_id",max_id);
+        }
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+			@Override
+			public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, "Some error with fetching");
+			}
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, String responseString) {
+				Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
+                if (max_id != null) {
+                    tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
+                    return;
+                }
+				for (int i = 0; i < tweets.length ; i++) {
+                    tweets[i].setMediaUrl(tweets[i].getMediaUrl());
+					tweets[i].save();
+					tweets[i].getUser().save();
+				}
+				tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
+			}
+		});
 	}
 
     public void postTweet(String post, final TweetsResponseInterface tweetsResponseInterface) {
@@ -101,37 +157,15 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
-	private void getHomeTimeline(Integer count, Integer since_id, Long max_id, AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/home_timeline.json");
-		RequestParams params = new RequestParams();
-		params.put("count", count);
-		params.put("since_id", since_id);
-		if (max_id != null) {
-			params.put("max_id",max_id);
-		}
-		client.get(apiUrl, params, handler);
-	}
-
-    private void getMentionsTimeline(Integer count, AsyncHttpResponseHandler handler) {
-        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+    public void getUserTimeLine(String screenName, final TweetsResponseInterface tweetsResponseInterface) {
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
         RequestParams params = new RequestParams();
-        params.put("count", count);
-        client.get(apiUrl, params, handler);
-    }
-
-	public interface TweetsResponseInterface {
-		public void fetchedTweets(List<Tweet> tweets);
-	}
-
-    public interface TweetUserResponseInterface {
-        public void fetchedUserInfo(TweetUser user);
-    }
-
-    public void getMentionsTimelineTweets(Integer count, final TweetsResponseInterface tweetsResponseInterface) {
-        getMentionsTimeline(count, new TextHttpResponseHandler() {
+        params.put("count", 25);
+        params.put("screen_name",screenName);
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d(TAG, "Some error with fetching");
+                Log.d(TAG, responseString);
             }
 
             @Override
@@ -141,37 +175,4 @@ public class TwitterClient extends OAuthBaseClient {
             }
         });
     }
-
-	public void getHomeTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
-		getHomeTimeline(count, since_id, max_id, new TextHttpResponseHandler() {
-			@Override
-			public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d(TAG, "Some error with fetching");
-			}
-
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, String responseString) {
-				Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
-                if (max_id != null) {
-                    tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
-                    return;
-                }
-				for (int i = 0; i < tweets.length ; i++) {
-                    tweets[i].setMediaUrl(tweets[i].getMediaUrl());
-					tweets[i].save();
-					tweets[i].getUser().save();
-				}
-				tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
-			}
-		});
-	}
-
-	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
-	 * 	  i.e getApiUrl("statuses/home_timeline.json");
-	 * 2. Define the parameters to pass to the request (query or body)
-	 *    i.e RequestParams params = new RequestParams("foo", "bar");
-	 * 3. Define the request method and make a call to the client
-	 *    i.e client.get(apiUrl, params, handler);
-	 *    i.e client.post(apiUrl, params, handler);
-	 */
 }

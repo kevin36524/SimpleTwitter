@@ -15,6 +15,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.activities.TweetDetailActivity;
+import com.codepath.apps.restclienttemplate.activities.UserProfileActivity;
 import com.codepath.apps.restclienttemplate.adapters.TwitterListAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
@@ -80,11 +81,24 @@ public abstract class TweetsListFragment extends Fragment implements TwitterList
 
     abstract void loadMoreTweets(int page, int totalItemsCount, RecyclerView view);
 
+    public Intent getIntentForAction(Tweet tweet, TwitterListAdapter.TweetsAction action) {
+        Intent intent = null;
+        switch (action) {
+            case TWEETS_ACTION_DETAIL:
+                intent = new Intent(getActivity(), TweetDetailActivity.class);
+                intent.putExtra("selectedTweet", Parcels.wrap(tweet));
+                break;
+            case TWEETS_ACTION_PROFILE:
+                intent = new Intent(getActivity(), UserProfileActivity.class);
+                intent.putExtra("currentUser", Parcels.wrap(tweet.getUser()));
+                break;
+        }
+        return intent;
+    }
+
     @Override
-    public void onTweetClicked(Tweet tweet) {
-        Intent intent = new Intent(getActivity(), TweetDetailActivity.class);
-        intent.putExtra("selectedTweet", Parcels.wrap(tweet));
-        startActivity(intent);
+    public void onTweetClicked(Tweet tweet, TwitterListAdapter.TweetsAction action) {
+        startActivity(getIntentForAction(tweet, action));
     }
 
     public void fetchTimelineAsync() {
