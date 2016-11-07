@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.RoundedCornersTransformation;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import java.util.ArrayList;
@@ -79,10 +80,13 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         holder.tvRelativeTime.setText(tweet.relativeTime());
         holder.ivProfile.setImageResource(0);
         holder.ivMediaImage.setImageResource(0);
-        Glide.with(mContext).load(tweet.getUser().getProfile_image_url()).into(holder.ivProfile);
+        Glide.with(mContext).load(tweet.getUser().getProfile_image_url())
+                .bitmapTransform(new RoundedCornersTransformation(mContext, 10, 0))
+                .into(holder.ivProfile);
         if (tweet.getMediaUrl() != null) {
             Glide.with(mContext).load(tweet.getMediaUrl())
                     .fitCenter()
+                    .bitmapTransform(new RoundedCornersTransformation(mContext, 40, 40))
                     .into(holder.ivMediaImage);
         }
 
