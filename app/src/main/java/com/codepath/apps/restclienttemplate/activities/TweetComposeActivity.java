@@ -16,12 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetUser;
-import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -63,7 +63,7 @@ public class TweetComposeActivity extends AppCompatActivity {
 
         tvScreenName.setText(currentUser.getName());
         tvHandle.setText("@"+currentUser.getScreen_name());
-        Picasso.with(this).load(currentUser.getProfile_image_url_https()).into(ivProfile);
+        Glide.with(this).load(currentUser.getProfile_image_url_https()).into(ivProfile);
 
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.TweetUser;
-import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -66,8 +66,8 @@ public class UserHeaderFragment extends Fragment {
         tvFollowersCount = (TextView) v.findViewById(R.id.tvFollowersCount);
 
 
-        Picasso.with(getActivity()).load(displayUser.getProfile_banner_url()).into(ivPosterImage);
-        Picasso.with(getActivity()).load(displayUser.getProfile_image_url()).into(ivProfileImage);
+        Glide.with(getActivity()).load(displayUser.getProfile_banner_url()).into(ivPosterImage);
+        Glide.with(getActivity()).load(displayUser.getProfile_image_url()).into(ivProfileImage);
         tvUserName.setText(displayUser.getName());
         tvScreenName.setText("@" + displayUser.getScreen_name());
         tvDescription.setText(displayUser.getDescription());

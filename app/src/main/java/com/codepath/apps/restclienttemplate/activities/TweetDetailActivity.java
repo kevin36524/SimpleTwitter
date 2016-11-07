@@ -9,13 +9,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.SimpleTwitterApplication;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorInflater;
-import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
 
@@ -66,14 +66,14 @@ public class TweetDetailActivity extends AppCompatActivity {
         ivShare = (ImageView) findViewById(R.id.ivShare);
 
         tvContent.setText(selectedTweet.getText());
-        Picasso.with(this).load(selectedTweet.getUser().getProfile_image_url_https()).into(ivProfileImage);
+        Glide.with(this).load(selectedTweet.getUser().getProfile_image_url_https()).into(ivProfileImage);
         tvName.setText(selectedTweet.getUser().getName());
         tvHandle.setText("@" + selectedTweet.getUser().getScreen_name());
         tvRetweetCount.setText("" + selectedTweet.getRetweet_count());
         tvFavoriteCount.setText("" + selectedTweet.getFavorite_count());
         ivMediaImage.setImageResource(0);
         if (selectedTweet.getMediaUrl() != null) {
-            Picasso.with(this).load(selectedTweet.getMediaUrl()).into(ivMediaImage);
+            Glide.with(this).load(selectedTweet.getMediaUrl()).fitCenter().into(ivMediaImage);
         }
     }
 

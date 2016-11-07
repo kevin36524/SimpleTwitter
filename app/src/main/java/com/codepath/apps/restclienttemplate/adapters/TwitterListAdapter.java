@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,9 +79,11 @@ public class TwitterListAdapter extends RecyclerView.Adapter<TwitterListAdapter.
         holder.tvRelativeTime.setText(tweet.relativeTime());
         holder.ivProfile.setImageResource(0);
         holder.ivMediaImage.setImageResource(0);
-        Picasso.with(mContext).load(tweet.getUser().getProfile_image_url_https()).into(holder.ivProfile);
+        Glide.with(mContext).load(tweet.getUser().getProfile_image_url()).into(holder.ivProfile);
         if (tweet.getMediaUrl() != null) {
-            Picasso.with(mContext).load(tweet.getMediaUrl()).into(holder.ivMediaImage);
+            Glide.with(mContext).load(tweet.getMediaUrl())
+                    .fitCenter()
+                    .into(holder.ivMediaImage);
         }
 
     }
