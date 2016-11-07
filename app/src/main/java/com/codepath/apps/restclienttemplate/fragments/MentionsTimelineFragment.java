@@ -36,11 +36,11 @@ public class MentionsTimelineFragment extends TweetsListFragment {
 
     @Override
     protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
-        tweetsListFragmentsListener.setRefreshing(false);
+        fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
     }
 
     private void fetchNewTweetsWithLastTweetID(final Long lastTweetID) {
-        twitterClient.getMentionsTimelineTweets(25, new TwitterClient.TweetsResponseInterface() {
+        twitterClient.getMentionsTimelineTweets(25, lastTweetID, new TwitterClient.TweetsResponseInterface() {
             @Override
             public void fetchedTweets(List<Tweet> tweets) {
                 if (lastTweetID == null) {

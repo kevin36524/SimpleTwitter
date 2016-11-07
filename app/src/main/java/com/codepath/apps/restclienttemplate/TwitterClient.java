@@ -76,22 +76,7 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
 
-    private  TextHttpResponseHandler responseHandlerFor(final String errorStringPrefix, final TweetUserResponseInterface responseInterface) {
-        return new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                responseInterface.requestFailed(errorStringPrefix + responseString);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                TweetUser user = gson.fromJson(responseString, TweetUser.class);
-                responseInterface.fetchedUserInfo(user);
-            }
-        };
-    }
-
-    public void getMentionsTimelineTweets(Integer count, final TweetsResponseInterface tweetsResponseInterface) {
+    public void getMentionsTimelineTweets(Integer count, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
         if (!isNetworkReachable()) {
             tweetsResponseInterface.requestFailed(NO_NETWORK_ERROR);
             return;
@@ -99,10 +84,46 @@ public class TwitterClient extends OAuthBaseClient {
         String apiUrl = getApiUrl("statuses/mentions_timeline.json");
         RequestParams params = new RequestParams();
         params.put("count", count);
+        params.put("since_id", 1);
+        if (max_id != null) {
+            params.put("max_id",max_id);
+        }
         client.get(apiUrl, params,responseHandlerFor("Fetching mentions_timeline failed ERR: ", tweetsResponseInterface));
     }
 
-	public void getHomeTimelineTweets(Integer count, Integer since_id, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
+    public void getUserTimeLine(String screenName, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
+        if (!isNetworkReachable()) {
+            tweetsResponseInterface.requestFailed(NO_NETWORK_ERROR);
+            return;
+        }
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", 25);
+        params.put("since_id", 1);
+        if (max_id != null) {
+            params.put("max_id",max_id);
+        }
+        params.put("screen_name",screenName);
+        client.get(apiUrl, params, responseHandlerFor("getUserTimeLine failed ERR: ", tweetsResponseInterface));
+    }
+
+    public void getUserFavorites(String screenName, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
+        if (!isNetworkReachable()) {
+            tweetsResponseInterface.requestFailed(NO_NETWORK_ERROR);
+            return;
+        }
+        String apiUrl = getApiUrl("favorites/list.json");
+        RequestParams params = new RequestParams();
+        params.put("count", 25);
+        params.put("since_id", 1);
+        if (max_id != null) {
+            params.put("max_id",max_id);
+        }
+        params.put("screen_name",screenName);
+        client.get(apiUrl, params, responseHandlerFor("getUserTimeLine failed ERR: ", tweetsResponseInterface));
+    }
+
+	public void getHomeTimelineTweets(Integer count, final Long max_id, final TweetsResponseInterface tweetsResponseInterface) {
         if (!isNetworkReachable()) {
             tweetsResponseInterface.requestFailed(NO_NETWORK_ERROR);
             return;
@@ -110,7 +131,7 @@ public class TwitterClient extends OAuthBaseClient {
         String apiUrl = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
         params.put("count", count);
-        params.put("since_id", since_id);
+        params.put("since_id", 1);
         if (max_id != null) {
             params.put("max_id",max_id);
         }
@@ -177,29 +198,6 @@ public class TwitterClient extends OAuthBaseClient {
                 ArrayList<Tweet> tweets = new ArrayList<Tweet>();
                 tweets.add(gson.fromJson(responseString, Tweet.class));
                 tweetsResponseInterface.fetchedTweets(tweets);
-            }
-        });
-    }
-
-    public void getUserTimeLine(String screenName, final TweetsResponseInterface tweetsResponseInterface) {
-        if (!isNetworkReachable()) {
-            tweetsResponseInterface.requestFailed(NO_NETWORK_ERROR);
-            return;
-        }
-        String apiUrl = getApiUrl("statuses/user_timeline.json");
-        RequestParams params = new RequestParams();
-        params.put("count", 25);
-        params.put("screen_name",screenName);
-        client.get(apiUrl, params, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                tweetsResponseInterface.requestFailed("getUserTimeLine failed ERR: " + responseString);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Tweet[] tweets = gson.fromJson(responseString, Tweet[].class);
-                tweetsResponseInterface.fetchedTweets(Arrays.asList(tweets));
             }
         });
     }
