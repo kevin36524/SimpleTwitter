@@ -89,6 +89,22 @@ public class TweetListActivity extends AppCompatActivity
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new TweetsListFragmentsPagerAdapter(getSupportFragmentManager(), this));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                currentFragment = (position == 0) ? homeTimelineFragment : mentionsTimelineFragment;
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                currentFragment = (position == 0) ? homeTimelineFragment : mentionsTimelineFragment;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         // Give the PagerSlidingTabStrip the ViewPager
         PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
@@ -146,9 +162,11 @@ public class TweetListActivity extends AppCompatActivity
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            currentFragment = new HomeTimelineFragment();
+            homeTimelineFragment = new HomeTimelineFragment();
+            currentFragment = homeTimelineFragment;
         } else {
-            currentFragment = new MentionsTimelineFragment();
+            mentionsTimelineFragment = new MentionsTimelineFragment();
+            currentFragment = mentionsTimelineFragment;
         }
         currentFragment.tweetsListFragmentsListener = this;
 

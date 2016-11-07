@@ -18,9 +18,12 @@ import java.util.List;
 
 public class MentionsTimelineFragment extends TweetsListFragment {
 
+    private Boolean didLoadEarliestTweet;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        didLoadEarliestTweet = false;
     }
 
     @Nullable
@@ -36,6 +39,10 @@ public class MentionsTimelineFragment extends TweetsListFragment {
     @Override
     public void loadMoreTweets(int page, int totalItemsCount) {
         Long lastTweetID = null;
+        if (didLoadEarliestTweet && page!=0) {
+            tweetsListFragmentsListener.setRefreshing(false);
+            return;
+        }
         if (page != 0) {
             lastTweetID = twitterListAdapter.getLastTweetID();
         }
@@ -50,6 +57,9 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                     resetRecyclerViewWithTweets(tweets);
                     tweetsListFragmentsListener.setRefreshing(false);
                     return;
+                }
+                if (tweets.size() < 25) {
+                    didLoadEarliestTweet = true;
                 }
                 appendTweets(tweets);
             }
