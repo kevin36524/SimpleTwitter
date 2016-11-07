@@ -56,7 +56,7 @@ public class TweetListActivity extends AppCompatActivity
 
     public void setCurrentFragment(TweetsListFragment currentFragment) {
         this.currentFragment = currentFragment;
-        currentFragment.fetchTimelineAsync();
+        currentFragment.loadMoreTweets(0, 25);
     }
 
     private void makeInitialNetworkCalls() {
@@ -82,7 +82,7 @@ public class TweetListActivity extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                currentFragment.fetchTimelineAsync();
+                currentFragment.loadMoreTweets(0, 25);
             }
         });
 

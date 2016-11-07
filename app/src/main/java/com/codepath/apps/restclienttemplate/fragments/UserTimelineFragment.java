@@ -3,7 +3,6 @@ package com.codepath.apps.restclienttemplate.fragments;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,8 +47,12 @@ public class UserTimelineFragment extends TweetsListFragment {
     }
 
     @Override
-    protected void loadMoreTweets(int page, int totalItemsCount, RecyclerView view) {
-        fetchNewTweetsWithLastTweetID(twitterListAdapter.getLastTweetID());
+    public void loadMoreTweets(int page, int totalItemsCount) {
+        Long lastTweetID = null;
+        if (page != 0) {
+            lastTweetID = twitterListAdapter.getLastTweetID();
+        }
+        fetchNewTweetsWithLastTweetID(lastTweetID);
     }
 
     private void fetchNewTweetsWithLastTweetID(final Long lastTweetID) {

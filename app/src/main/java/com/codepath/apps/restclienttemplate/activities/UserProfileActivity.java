@@ -2,9 +2,11 @@ package com.codepath.apps.restclienttemplate.activities;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 
 import com.astuetz.PagerSlidingTabStrip;
@@ -23,6 +25,8 @@ public class UserProfileActivity extends AppCompatActivity implements
     static final String pagerTitles[] = {"TWEETS", "FAVORITES"};
     UserTimelineFragment userTimelineFragment;
     UserFavoriteFragment favoritesTimelineFragment;
+    TweetsListFragment currentFragment;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +37,18 @@ public class UserProfileActivity extends AppCompatActivity implements
         if (savedInstanceState == null) {
             createAndAppendFragments();
         }
+        bindViews();
         addViewPager();
+    }
+
+    private void bindViews() {
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                currentFragment.loadMoreTweets(0, 25);
+            }
+        });
     }
 
     private void addViewPager() {
@@ -54,6 +69,8 @@ public class UserProfileActivity extends AppCompatActivity implements
         favoritesTimelineFragment = UserFavoriteFragment.newInstance(currentUser);
         favoritesTimelineFragment.tweetsListFragmentsListener = this;
 
+        currentFragment = userTimelineFragment;
+
         UserHeaderFragment userHeaderFragment = UserHeaderFragment.newInstance(currentUser);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -63,12 +80,13 @@ public class UserProfileActivity extends AppCompatActivity implements
 
     @Override
     public void setRefreshing(Boolean refreshing) {
-
+        swipeRefreshLayout.setRefreshing(refreshing);
     }
 
     @Override
     public void showError(String errorString) {
-
+        Snackbar.make(swipeRefreshLayout, errorString, Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     // TweetsListFragmentsPagerDataSource

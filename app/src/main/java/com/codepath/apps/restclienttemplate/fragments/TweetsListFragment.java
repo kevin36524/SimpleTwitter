@@ -72,13 +72,13 @@ public abstract class TweetsListFragment extends Fragment implements TwitterList
         endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                loadMoreTweets(page,totalItemsCount,view);
+                loadMoreTweets(page,totalItemsCount);
             }
         };
         rvTweetsList.addOnScrollListener(endlessRecyclerViewScrollListener);
     }
 
-    abstract void loadMoreTweets(int page, int totalItemsCount, RecyclerView view);
+    abstract public void loadMoreTweets(int page, int totalItemsCount);
 
     public Intent getIntentForAction(Tweet tweet, TwitterListAdapter.TweetsAction action) {
         Intent intent = null;
@@ -98,15 +98,6 @@ public abstract class TweetsListFragment extends Fragment implements TwitterList
     @Override
     public void onTweetClicked(Tweet tweet, TwitterListAdapter.TweetsAction action) {
         startActivity(getIntentForAction(tweet, action));
-    }
-
-    public void fetchTimelineAsync() {
-        if (!twitterClient.isNetworkReachable()) {
-            tweetsListFragmentsListener.showError("No network connectivity");
-            tweetsListFragmentsListener.setRefreshing(false);
-        } else {
-            loadMoreTweets(0, 25, rvTweetsList);
-        }
     }
 
     // Adapter Interface
